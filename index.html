@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>からだ相談室｜神泉整体センター</title>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column — concern picker on top, advice stack below; only the "today's three" block is set off as a panel */
+:root{
+  --bg:#eef2f1; --surface:#ffffff; --line:#d3dcda; --ink:#1d2a3a; --muted:#5d6b78;
+  --ai:#2c4f7c; --ai-soft:#dce6f2; --take:#4f8a5b; --kaki:#d0703b; --bad:#c2453d;
+  --f-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"Consolas",monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121821; --surface:#1a2230; --line:#2c3848; --ink:#e3e9f0; --muted:#97a5b5;
+  --ai:#8db3e8; --ai-soft:#22334b; --take:#7fc08c; --kaki:#eb9563; --bad:#ec7a70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121821; --surface:#1a2230; --line:#2c3848; --ink:#e3e9f0; --muted:#97a5b5;
+  --ai:#8db3e8; --ai-soft:#22334b; --take:#7fc08c; --kaki:#eb9563; --bad:#ec7a70; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.75;padding-inline:16px;padding-block:0 56px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{padding-top:28px}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.8rem;margin:0;letter-spacing:.04em}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+h2{font-family:var(--f-display);font-size:1.1rem;font-weight:700;margin:0 0 10px;display:flex;align-items:baseline;gap:10px;text-wrap:balance}
+h2 .en{font:500 .66rem var(--f-num);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.hint{font-size:.8rem;color:var(--muted);margin:0}
+button:focus-visible,input:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+
+.groups{display:flex;flex-direction:column;gap:12px}
+.group{display:grid;grid-template-columns:7.5em 1fr;gap:10px;align-items:start}
+.group > span{font-size:.8rem;color:var(--muted);padding-top:6px}
+@media (max-width:520px){.group{grid-template-columns:1fr;gap:4px}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.88rem;padding:5px 14px;border-radius:99px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--ai);background:var(--ai);color:var(--surface)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.linkbtn{border:0;background:none;color:var(--ai);font:inherit;font-size:.82rem;cursor:pointer;padding:0;text-decoration:underline}
+
+.out{display:flex;flex-direction:column;gap:26px}
+.empty{font-size:.9rem;color:var(--muted);padding:22px;border:1px dashed var(--line);border-radius:12px;text-align:center}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.today3{display:flex;flex-direction:column;gap:10px}
+.today3 label{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;font-size:.95rem;cursor:pointer}
+.today3 input{width:18px;height:18px;margin-top:5px;accent-color:var(--ai)}
+.today3 input:checked + span{color:var(--muted);text-decoration:line-through}
+.acat{display:flex;flex-direction:column;gap:6px;padding-block:12px;border-bottom:1px solid var(--line)}
+.acat:first-of-type{padding-top:0}
+.acat h3{margin:0;font-size:.9rem;font-weight:700;color:var(--ai)}
+.acat ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:5px;font-size:.92rem}
+.acat li small{color:var(--muted);font-size:.72rem;margin-left:8px;white-space:nowrap}
+
+.routine{display:flex;flex-direction:column;gap:8px;padding-block:14px;border-bottom:1px solid var(--line)}
+.routine header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:0}
+.routine h3{margin:0;font-family:var(--f-display);font-size:1.02rem}
+.routine .tag{font-size:.72rem;color:var(--muted)}
+.routine ol{margin:0;padding-left:1.3em;font-size:.88rem}
+.act{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{border:1px solid var(--ai);background:var(--ai);color:var(--surface);font:500 .85rem var(--f-body);padding:6px 14px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ai)}
+.timer{font:500 1.35rem var(--f-num);font-variant-numeric:tabular-nums;min-width:4.2em}
+.fin{font-size:.8rem;color:var(--take)}
+
+.redflag{border:1px solid var(--bad);border-radius:12px;padding:12px 16px;font-size:.88rem}
+.redflag b{color:var(--bad)}
+.redflag ul{margin:6px 0 0;padding-left:1.2em}
+.brand{font:700 .78rem var(--f-body);letter-spacing:.2em;color:var(--ai)}
+.jump{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--ai-soft);border-radius:12px;padding:10px 16px;font-size:.88rem}
+.consult{display:flex;flex-direction:column;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 18px;scroll-margin-top:16px}
+.consult .lead{margin:0;font-size:.9rem}
+.staff{display:flex;flex-wrap:wrap;gap:10px}
+.staff div{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:500}
+.staff a{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:500;color:var(--ink);text-decoration:none;padding:4px 10px 4px 4px;border-radius:99px;border:1px solid var(--line)}
+.staff a:hover{border-color:var(--ai)}
+.other{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+.otherlinks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:440px){.otherlinks{grid-template-columns:1fr}}
+.olink{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;text-decoration:none;color:var(--ink);font-weight:500;font-size:.92rem;background:var(--bg)}
+.olink:hover{border-color:var(--ai)}
+.olink b{font-size:.78rem;font-weight:400;color:var(--muted)}
+.olink b.num{color:var(--ai);font-size:.85rem}
+.pages{display:flex;flex-wrap:wrap;gap:8px}
+.pages a{font-size:.85rem;color:var(--ai);border:1px solid var(--ai);border-radius:99px;padding:3px 12px;text-decoration:none}
+.pages a:hover{background:var(--ai-soft)}
+.staff small{display:block;font-size:.72rem;color:var(--muted);font-weight:400;line-height:1.3}
+.staff span{line-height:1.3}
+.staff i{width:30px;height:30px;border-radius:50%;background:var(--ai-soft);color:var(--ai);display:grid;place-items:center;font:700 .85rem var(--f-display);font-style:normal}
+.form{display:flex;flex-direction:column;gap:16px}
+.q{display:flex;flex-direction:column;gap:6px}
+.ql{font-size:.8rem;color:var(--muted);font-weight:500}
+.picked{font-size:.92rem;font-weight:500}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:.85rem;padding:4px 12px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--ai);background:var(--ai);color:var(--surface)}
+.consult .chip{background:var(--bg)}
+.consult .chip[aria-pressed="true"]{background:var(--ai)}
+input[type=range]{width:100%;accent-color:var(--ai)}
+.scale{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;color:var(--ai)}
+textarea{font:inherit;font-size:.92rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;resize:vertical}
+.preview pre{margin:6px 0 0;white-space:pre-wrap;font:inherit;font-size:.85rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;max-height:260px;overflow:auto}
+.sendrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn.line{background:#06c755;border-color:#06c755;color:#fff;font-size:.95rem;padding:9px 18px}
+.note{font-size:.75rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">神泉整体センター</div>
+    <h1>からだ相談室</h1>
+    <p>ダイエットや、なんとなく続く不調。いまの悩みを選ぶと、食事・睡眠・運動・姿勢・こころの面から、今日からできることをお伝えします。</p>
+  </header>
+
+  <section>
+    <h2>いまの悩み<span class="en">Concerns</span></h2>
+    <div class="groups" id="groups"></div>
+    <div class="toolbar">
+      <span class="hint" id="selCount">いくつでも選べます</span>
+      <button class="linkbtn" type="button" id="clearBtn">選択をすべて外す</button>
+    </div>
+  </section>
+
+  <section class="out" id="out"></section>
+
+  <section class="consult" id="consult" hidden>
+    <h2>先生に相談する<span class="en">Ask our staff</span></h2>
+    <p class="lead">ここまでのアドバイスは一般的な目安です。からだの状態は一人ひとり違います。下の質問に答えてLINEで送ると、先生があなたの状態に合わせてお返事します。来院前に伝えておくと、当日の施術もスムーズです。</p>
+    <div class="staff" id="staff"></div>
+
+    <div class="form">
+      <div class="q"><span class="ql">相談したい悩み</span><div class="picked" id="pickedList"></div></div>
+      <div class="q"><span class="ql">いつから</span><div class="seg" id="q-since"></div></div>
+      <div class="q"><span class="ql">つらいのはどんな時（複数可）</span><div class="chips" id="q-when"></div></div>
+      <div class="q"><label class="ql" for="q-level">つらさの強さ <b class="num" id="q-levelV">5</b> / 10</label>
+        <input type="range" id="q-level" min="0" max="10" value="5"><div class="scale"><span>0 気にならない</span><span>10 がまんできない</span></div></div>
+      <div class="q"><span class="ql">ふだんの過ごし方</span><div class="seg" id="q-work"></div></div>
+      <div class="q"><span class="ql">ご来院について</span><div class="seg" id="q-visit"></div></div>
+      <div class="q"><span class="ql">担当の希望</span><div class="seg" id="q-staff"></div></div>
+      <div class="q"><label class="ql" for="q-free">先生に聞きたいこと（任意）</label>
+        <textarea id="q-free" rows="3" placeholder="例 デスクワークで夕方になると首から肩が重くなります。自宅でできることと、施術の回数の目安を知りたいです。"></textarea></div>
+    </div>
+
+    <div class="preview">
+      <span class="ql">送る内容</span>
+      <pre id="msgPreview"></pre>
+    </div>
+    <div class="sendrow">
+      <button class="btn line" type="button" id="lineBtn">LINEで先生に送る</button>
+      <button class="btn ghost" type="button" id="copyBtn">文面をコピー</button>
+      <span class="hint" id="sendState"></span>
+    </div>
+    <p class="hint" id="sendHint">「LINEで先生に送る」を押すと、文面がコピーされ、神泉整体センターのLINE公式アカウントが開きます。友だち追加がまだの方は追加してから、トーク画面に貼り付けて送信してください。お電話でのご相談は <b class="num" id="telNo"></b> まで。</p>
+    <div class="other">
+      <span class="ql">ほかの方法</span>
+      <div class="otherlinks">
+        <a class="olink" id="telLink" href="#">電話で相談する<b class="num"></b></a>
+        <a class="olink" id="reserveLink" href="#" target="_blank" rel="noopener">Webで予約する<b>空き状況を見る</b></a>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">ここでのアドバイスは、生活習慣を整えるための一般的な目安です。診断や治療の代わりにはなりません。症状が強い、長引く、いつもと違うと感じるときは医療機関に相談してください。</p>
+</div>
+
+<script>
+(function(){
+/* ===== 院の設定 ===== */
+const CLINIC={
+  name:"神泉整体センター",
+  lineUrl:"https://lin.ee/AfuRTMr",  // 友だち追加・トークを開くリンク（公式サイトと同じ）
+  lineId:"",                 // ベーシックID（例 "@123abcde"）を入れると、文面入りのトーク画面を直接開けます。LINE Official Account Manager の「アカウント設定」で確認できます
+  liffId:"",                 // LINE Developers で作った LIFF アプリの ID（例 "2001234567-AbCdEfGh"）。リッチメニューから開いたとき、ボタン1つでトークに送信できます
+  tel:"03-5489-0425", telHref:"tel:0354890425",
+  site:"https://shibuya-seitai.com",
+  reserve:"https://shibuya-seitai.com/reserve",
+  staff:[["林先生","バランス整体","hayashi"],["堀部先生","スポーツ整体","horibe"],["大内先生","鍼灸整体","ouchi"]],
+  // 悩み → 公式サイトの症状ページ
+  pages:{shoulder:["肩こり","stiff-shoulder"],back:["腰痛","lower-back"],headache:["頭痛","headache"],sleepless:["睡眠の悩み","sleep"],posture:["首・姿勢","neck"],
+         fatigue:["自律神経の乱れ","autonomic"],mood:["自律神経の乱れ","autonomic"],dizzy:["自律神経の乱れ","autonomic"],hot:["自律神経の乱れ","autonomic"]}
+};
+const $=id=>document.getElementById(id);
+const CAT={posture:"姿勢",move:"運動",sleep:"睡眠",food:"食事",mind:"こころ・暮らし"};
+const GROUPS=[["体型・ダイエット",["weight","belly","swell"]],["からだの不調",["shoulder","back","headache","fatigue","cold","constip","stomach","dizzy","hot"]],["睡眠・こころ",["sleepless","mood"]],["姿勢",["posture"]]];
+const ADV={
+ weight:{l:"体重を減らしたい",food:["主食は毎食こぶし1つ分、たんぱく質（肉・魚・卵・大豆）は手のひら1枚分を毎食とる","夕食は寝る3時間前までに。遅くなる日は主食を半分に","甘い飲み物は水かお茶に置き換える"],sleep:["睡眠が6時間未満の日が続くと食欲が増えやすい。まず7時間を目標に"],move:["毎日の歩数を今より2,000歩増やす","週2〜3回のスクワットで筋肉量を保つ"],mind:["体重は毎朝トイレの後に測り、日々の増減ではなく週の平均で見る"],r:["strength","walk"],red:["意図せず1か月で体重の5%以上が減った"]},
+ belly:{l:"お腹まわり",food:["野菜・海藻・きのこを先に食べる","甘い飲み物とお酒を今の半分に"],move:["プランクとヒップリフトで体幹を鍛える","早歩き20分を週4回"],posture:["立つときはお腹を軽く引き上げ、反り腰にならないようにする"],r:["strength","posture"]},
+ swell:{l:"むくみ",food:["塩分を控え、カリウムの多い野菜・果物・海藻をとる","水はコップ6〜8杯を少しずつこまめに"],move:["かかと上げ 20回 ×3セットでふくらはぎを動かす","1時間に1回は立って歩く"],sleep:["寝る前に壁に脚を上げて3分休む"],r:["yoga","walk"],red:["片脚だけが急に強くむくむ、痛む","息切れを伴うむくみ"]},
+ cold:{l:"冷え",food:["温かい汁物、生姜、根菜を取り入れる","朝食を抜かない"],move:["スクワットなど大きな筋肉を動かす運動をする"],sleep:["寝る1〜2時間前に40℃前後の湯船に10〜15分つかる"],mind:["首・手首・足首を冷やさない服装にする"],r:["strength","yoga"]},
+ shoulder:{l:"肩こり",posture:["画面を目の高さに上げ、肘は90度に","30分ごとに肩を後ろに10回まわす"],move:["肩甲骨寄せと胸開きのストレッチをする"],sleep:["枕は首のすき間が埋まる高さにする"],mind:["肩に力が入ったと気づいたら、息を吐いて肩を落とす"],r:["posture","stretch"],red:["腕や手のしびれ、力が入りにくい"]},
+ back:{l:"腰痛",posture:["坐骨を立てて座り、脚を組まない","物を持ち上げるときは膝を曲げて腰を落とす"],move:["キャット＆カウとヒップリフトを毎日少しずつ","長く座ったら立って腰を伸ばす"],r:["posture","yoga"],red:["脚のしびれ、排尿・排便の異常","安静にしていても強く痛む"]},
+ headache:{l:"頭痛",sleep:["寝不足と寝すぎの両方を避け、起床時刻をそろえる"],food:["水分不足と食事抜きを避ける","カフェインの量を毎日一定にする（急にやめても頭痛が出ることがある）"],posture:["スマホを見るときに首が前に出ないようにし、あご引き運動をする"],mind:["頭痛が出た日の天気・生理周期・食べた物をメモしておくと、きっかけが見つかりやすい"],r:["posture","breath"],red:["突然の激しい頭痛","発熱、手足のしびれ、ろれつが回らない"]},
+ constip:{l:"便秘",food:["朝起きたらコップ1杯の水か白湯を飲む","海藻・オクラ・オートミールなどの水溶性食物繊維と発酵食品をとる"],move:["歩く、お腹をひねるなどで腸を刺激する"],mind:["朝食の後に5分トイレに座る習慣をつける"],r:["walk","yoga"],red:["血便、急な便通の変化","強い腹痛"]},
+ fatigue:{l:"疲れ・だるさ",sleep:["平日と休日の起床時刻の差を1時間以内にする"],food:["鉄とたんぱく質（赤身肉・魚・大豆）を毎食とる","朝食は糖質だけでなくたんぱく質も一緒に"],move:["疲れている日こそ5分ストレッチで血流を上げる"],mind:["予定を詰めすぎず、何もしない時間を予定に入れる"],r:["stretch","breath"],red:["2週間以上続くだるさ","息切れ、体重減少を伴う"]},
+ sleepless:{l:"眠れない・眠りが浅い",sleep:["毎日同じ時刻に起き、朝日を浴びる","寝る1時間前から画面を見ず、照明を暗くする","カフェインは14時までにする"],food:["夕食は寝る3時間前まで。寝酒は眠りを浅くする"],move:["日中に体を動かす（夜の激しい運動は避ける）"],mind:["眠れないときは一度布団から出て、眠くなってから戻る"],r:["breath","yoga"],red:["眠れない状態が1か月以上続く","大きないびきや、寝ている間に呼吸が止まると言われた"]},
+ mood:{l:"イライラ・落ち込み",mind:["1日5分、呼吸だけに集中する時間をとる","気分が落ちやすい時間帯や出来事に気づいたら、短くメモする"],move:["20分の早歩きをする"],sleep:["睡眠不足は気分の波を大きくする。まず睡眠時間を確保する"],food:["甘い物だけを単品で食べず、食事と一緒にとる"],r:["breath","walk"],red:["2週間以上の落ち込み、何も楽しめない","自分を傷つけたい気持ちがある（すぐに相談窓口や医療機関へ）"]},
+ posture:{l:"猫背・姿勢",posture:["壁立ちチェックを1日1回行う","スマホは目の高さで見る","座るときは耳・肩・骨盤を一直線にそろえる"],move:["胸開きと肩甲骨寄せで、縮んだ体の前側を伸ばす","プランクで体幹を支える力をつける"],r:["posture","strength"]},
+ stomach:{l:"胃腸の不調",food:["よく噛んで腹八分にする","脂っこい物・刺激物・お酒を控えめにする","寝る直前に食べない"],mind:["食事の時間はゆっくりとり、ながら食べを避ける"],posture:["食後すぐに前かがみの姿勢をとらない"],r:["breath"],red:["黒い便、吐血","体重減少や続く腹痛"]},
+ hot:{l:"ほてり・のぼせ",food:["大豆製品を取り入れ、香辛料とお酒は控えめにする"],sleep:["寝室はやや涼しめに、通気のよい寝具を使う"],move:["ウォーキングなどの軽い運動を習慣にする"],mind:["ほてりが出やすい時間帯や場面を知っておくと、服装や予定で対策できる"],r:["breath","walk"],red:["日常生活がつらいほどの症状（婦人科で相談できます）"]},
+ dizzy:{l:"めまい",food:["食事を抜かず、水分をこまめにとる","鉄分（赤身肉・魚・ほうれん草）をとる"],sleep:["睡眠不足を避ける"],posture:["急に立ち上がらず、ゆっくり動く"],r:["breath"],red:["激しいめまい、手足のしびれ、話しにくさ、物が二重に見える（すぐ受診）"]}
+};
+const ROUTINES={
+  posture:{title:"姿勢リセット",min:5,tag:"猫背・肩こり・腰痛に",steps:["壁立ち：後頭部・肩甲骨・お尻・かかとを壁につけて30秒","あご引き（チンタック）5秒キープ ×10回","胸を開く：両手を後ろで組んで胸を張る（30秒）","肩を後ろに10回まわす","座り直し：坐骨を立て、耳・肩・骨盤を一直線に"]},
+  stretch:{title:"朝のほぐしストレッチ",min:5,tag:"肩こり・だるさに",steps:["首をゆっくり左右に倒す（各20秒）","肩甲骨を寄せて5秒キープ ×10回","両手を組んで体側を伸ばす（左右各20秒）","立ったまま前屈（30秒）","壁に手をついてふくらはぎを伸ばす（各30秒）"]},
+  strength:{title:"自重スクワットと体幹",min:10,tag:"代謝アップ・ダイエットに",steps:["スクワット 15回 ×2セット","ヒップリフト 15回 ×2セット","プランク 30秒 ×2セット","セット間は30秒休む"]},
+  breath:{title:"4-7-8 呼吸",min:4,tag:"ストレス・寝つきに",steps:["口から息を吐ききる","鼻から4秒かけて吸う","7秒息を止める","口から8秒かけて吐く","これを繰り返す"]},
+  yoga:{title:"寝る前のゆるヨガ",min:8,tag:"眠りの質・冷え・むくみに",steps:["チャイルドポーズ（1分）","キャット＆カウ 10回","仰向けで膝を倒すねじり（左右各1分）","壁に脚を上げて休む（3分）"]},
+  walk:{title:"早歩きウォーキング",min:20,tag:"体重管理・気分転換に",steps:["少し息が弾む速さで歩く","腕を後ろに大きく振る","かかとから着地する"]}
+};
+
+let sel=[];
+try{sel=JSON.parse(localStorage.getItem("soudan.sel")||"[]").filter(k=>ADV[k])}catch(e){}
+const remember=()=>{try{localStorage.setItem("soudan.sel",JSON.stringify(sel))}catch(e){}};
+
+function renderPicker(){
+  const g=$("groups");g.innerHTML="";
+  GROUPS.forEach(([label,keys])=>{
+    const row=document.createElement("div");row.className="group";
+    const sp=document.createElement("span");sp.textContent=label;
+    const ch=document.createElement("div");ch.className="chips";
+    keys.forEach(k=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=ADV[k].l;
+      b.setAttribute("aria-pressed",String(sel.includes(k)));
+      b.onclick=()=>{sel=sel.includes(k)?sel.filter(x=>x!==k):sel.concat(k);remember();renderPicker();renderAdvice();renderConsult()};
+      ch.appendChild(b)});
+    row.append(sp,ch);g.appendChild(row);
+  });
+  $("selCount").textContent=sel.length?sel.length+"つ選択中":"いくつでも選べます";
+  $("clearBtn").hidden=!sel.length;
+}
+
+let timer=null;
+const pad=n=>String(n).padStart(2,"0"), fmt=s=>pad(Math.floor(s/60))+":"+pad(s%60);
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+
+function renderAdvice(){
+  const out=$("out");out.innerHTML="";
+  if(timer&&!sel.some(k=>ADV[k].r.includes(timer.key))){clearInterval(timer.h);timer=null}
+  if(!sel.length){out.appendChild(el("div","empty","上の一覧から、気になっていることを選んでください。"));return}
+
+  // group tips by category, remembering which concern each came from
+  const groups={};Object.keys(CAT).forEach(c=>groups[c]=[]);
+  sel.forEach(k=>Object.keys(CAT).forEach(c=>(ADV[k][c]||[]).forEach(t=>{const e=groups[c].find(x=>x.t===t);e?e.from.push(ADV[k].l):groups[c].push({t,from:[ADV[k].l]})})));
+
+  // today's three: one per concern in turn, preferring posture/move first
+  const three=[];
+  for(let round=0;three.length<3&&round<3;round++)for(const k of sel){if(three.length>=3)break;for(const c of Object.keys(CAT)){const t=(ADV[k][c]||[])[round];if(t&&!three.includes(t)){three.push(t);break}}}
+
+  const s1=el("section");s1.appendChild(Object.assign(el("h2",null,"今日の3つ"),{}));s1.firstChild.appendChild(el("span","en","Today"));
+  const p=el("div","panel today3");
+  three.forEach((t,i)=>{const lb=el("label");const cb=el("input");cb.type="checkbox";cb.id="t3-"+i;lb.append(cb,el("span",null,t));p.appendChild(lb)});
+  s1.appendChild(p);out.appendChild(s1);
+  const jp=el("div","jump");jp.appendChild(el("span",null,"自分の場合はどうなのか、もっと詳しく知りたいときは先生に相談できます。"));
+  const jb=el("button","btn ghost","先生に相談する");jb.type="button";jb.onclick=()=>$("consult").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+  jp.appendChild(jb);out.appendChild(jp);
+
+  const s2=el("section");const h2=el("h2",null,"悩み別のアドバイス");h2.appendChild(el("span","en","Advice"));s2.appendChild(h2);
+  Object.entries(CAT).forEach(([c,l])=>{if(!groups[c].length)return;
+    const d=el("div","acat");d.appendChild(el("h3",null,l));const ul=el("ul");
+    groups[c].forEach(x=>{const li=el("li",null,x.t);if(sel.length>1)li.appendChild(el("small",null,x.from.join("・")));ul.appendChild(li)});
+    d.appendChild(ul);s2.appendChild(d)});
+  const pg=[];sel.forEach(k=>{const p=CLINIC.pages[k];if(p&&!pg.some(x=>x[1]===p[1]))pg.push(p)});
+  if(pg.length){const d=el("div","acat");d.appendChild(el("h3",null,"神泉整体センターの解説"));const w=el("div","pages");
+    pg.forEach(([l,slug])=>{const a=el("a",null,l+"について読む");a.href=CLINIC.site+"/symptoms/"+slug;a.target="_blank";a.rel="noopener";w.appendChild(a)});
+    d.appendChild(w);s2.appendChild(d)}
+  out.appendChild(s2);
+
+  const recos=[...new Set(sel.flatMap(k=>ADV[k].r))];
+  const s3=el("section");const h3=el("h2",null,"おすすめの体操");h3.appendChild(el("span","en","Routines"));s3.appendChild(h3);
+  recos.forEach(key=>{const rt=ROUTINES[key];
+    const box=el("div","routine");const hd=el("header");hd.append(el("h3",null,rt.title),el("span","tag",rt.min+"分 · "+rt.tag));
+    const ol=el("ol");rt.steps.forEach(s=>ol.appendChild(el("li",null,s)));
+    const act=el("div","act");const running=timer&&timer.key===key;
+    const btn=el("button","btn"+(running?" ghost":""),running?"止める":"タイマー開始");btn.type="button";
+    const tm=el("span","timer",fmt(running?timer.left:rt.min*60));tm.dataset.key=key;
+    const fin=el("span","fin",timer===null&&lastDone===key?"おつかれさまでした":"");
+    btn.onclick=()=>toggle(key);
+    act.append(btn,tm,fin);box.append(hd,ol,act);s3.appendChild(box)});
+  out.appendChild(s3);
+
+  const reds=sel.filter(k=>ADV[k].red);
+  if(reds.length){const r=el("div","redflag");r.appendChild(el("b",null,"こんなときは早めに受診を"));const ul=el("ul");
+    reds.forEach(k=>ADV[k].red.forEach(t=>ul.appendChild(el("li",null,ADV[k].l+"："+t))));r.appendChild(ul);out.appendChild(r)}
+}
+
+let lastDone=null;
+function toggle(key){
+  if(timer&&timer.key===key){clearInterval(timer.h);timer=null;renderAdvice();return}
+  if(timer)clearInterval(timer.h);
+  lastDone=null;timer={key,left:ROUTINES[key].min*60};
+  timer.h=setInterval(()=>{timer.left--;const t=document.querySelector('.timer[data-key="'+key+'"]');if(t)t.textContent=fmt(timer.left);
+    if(timer.left<=0){clearInterval(timer.h);timer=null;lastDone=key;renderAdvice()}},1000);
+  renderAdvice();
+}
+
+/* ===== 先生に相談 ===== */
+const Q={since:null,when:[],level:5,work:null,visit:null,staff:"指名なし"};
+function segQ(id,opts,key,multi){
+  const g=$(id);g.innerHTML="";
+  opts.forEach(o=>{const b=el("button",multi?"chip":null,o);b.type="button";
+    const on=()=>multi?Q[key].includes(o):Q[key]===o;
+    b.setAttribute("aria-pressed",String(on()));
+    b.onclick=()=>{if(multi)Q[key]=on()?Q[key].filter(x=>x!==o):Q[key].concat(o);else Q[key]=on()?null:o;
+      [...g.children].forEach(c=>c.setAttribute("aria-pressed",String(multi?Q[key].includes(c.textContent):Q[key]===c.textContent)));updateMsg()};
+    g.appendChild(b)});
+}
+function buildMsg(){
+  const L=["【からだ相談室からの相談】"];
+  L.push("■ 悩み："+(sel.map(k=>ADV[k].l).join("、")||"未選択"));
+  if(Q.since)L.push("■ いつから："+Q.since);
+  if(Q.when.length)L.push("■ つらい時："+Q.when.join("、"));
+  L.push("■ つらさ："+Q.level+" / 10");
+  if(Q.work)L.push("■ ふだん："+Q.work);
+  if(Q.visit)L.push("■ 来院："+Q.visit);
+  L.push("■ 担当希望："+Q.staff);
+  const f=$("q-free").value.trim();if(f)L.push("■ 聞きたいこと：\n"+f);
+  return L.join("\n");
+}
+function updateMsg(){$("msgPreview").textContent=buildMsg()}
+function renderConsult(){
+  $("consult").hidden=!sel.length;
+  $("pickedList").textContent=sel.map(k=>ADV[k].l).join("、");
+  updateMsg();
+}
+function initConsult(){
+  const st=$("staff");CLINIC.staff.forEach(([n,sp,id])=>{const d=el("a");d.href=CLINIC.site+"/staff#"+id;d.target="_blank";d.rel="noopener";const t=el("span",null,n);t.appendChild(el("small",null,sp));d.append(el("i",null,n[0]),t);st.appendChild(d)});
+  $("telNo").textContent=CLINIC.tel;
+  $("telLink").href=CLINIC.telHref;$("telLink").querySelector("b").textContent=CLINIC.tel;
+  $("reserveLink").href=CLINIC.reserve;
+  segQ("q-since",["数日前から","1〜4週間","1〜3か月","3か月以上"],"since");
+  segQ("q-when",["朝起きた時","座っている時","立っている時","夕方〜夜","寝る時","動いた時","天気の変わり目","生理の前後"],"when",true);
+  segQ("q-work",["デスクワーク","立ち仕事","力仕事","家事・育児","その他"],"work");
+  segQ("q-visit",["初めて","通院中","以前通っていた"],"visit");
+  segQ("q-staff",["指名なし"].concat(CLINIC.staff.map(([n,sp])=>n+"（"+sp+"）")),"staff");
+  $("q-level").oninput=e=>{Q.level=+e.target.value;$("q-levelV").textContent=Q.level;updateMsg()};
+  $("q-free").oninput=updateMsg;
+  $("lineBtn").onclick=()=>{
+    const msg=buildMsg();
+    if(inLine){
+      $("lineBtn").disabled=true;$("sendState").textContent="送信しています…";
+      liff.sendMessages([{type:"text",text:msg}]).then(()=>{
+        $("sendState").textContent="送信しました。先生からのお返事をお待ちください。";
+        setTimeout(()=>liff.closeWindow(),1500);
+      }).catch(()=>{
+        $("lineBtn").disabled=false;
+        $("sendState").textContent="送信できませんでした。「文面をコピー」でコピーして、トークに貼り付けてください。";
+      });
+      return;
+    }
+    if(CLINIC.lineId){
+      window.open("https://line.me/R/oaMessage/"+encodeURIComponent(CLINIC.lineId)+"/?"+encodeURIComponent(msg),"_blank","noopener");
+      $("sendState").textContent="LINEを開きました。内容を確認して送信してください。";return;
+    }
+    // ベーシックID未設定時：文面をコピーしてから公式アカウントを開く
+    let copied=true;
+    try{navigator.clipboard.writeText(msg).catch(()=>{copied=false})}catch(e){copied=false}
+    window.open(CLINIC.lineUrl,"_blank","noopener");
+    setTimeout(()=>{$("sendState").textContent=copied?"文面をコピーしました。開いたLINEのトーク画面に貼り付けて送信してください。":"LINEを開きました。下の「文面をコピー」でコピーして、トークに貼り付けてください。"},300);
+  };
+  $("copyBtn").onclick=async()=>{
+    try{await navigator.clipboard.writeText(buildMsg());$("sendState").textContent="コピーしました"}
+    catch(e){const r=document.createRange();r.selectNodeContents($("msgPreview"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("sendState").textContent="文面を選択しました。コピーしてください"}
+  };
+}
+
+/* ===== LINE（LIFF）内で開かれたとき ===== */
+let inLine=false;
+async function initLiff(){
+  if(!CLINIC.liffId||!window.liff)return;
+  try{
+    await liff.init({liffId:CLINIC.liffId});
+    inLine=liff.isInClient();
+    if(!inLine)return;
+    $("lineBtn").textContent="この内容を先生に送る";
+    $("sendHint").textContent="「この内容を先生に送る」を押すと、神泉整体センターとのトークにこの文面が送信されます。お電話でのご相談は "+CLINIC.tel+" まで。";
+  }catch(e){}
+}
+
+$("clearBtn").onclick=()=>{sel=[];remember();renderPicker();renderAdvice();renderConsult()};
+initConsult();initLiff();
+renderPicker();renderAdvice();renderConsult();
+})();
+</script>
+</body>
+</html>
