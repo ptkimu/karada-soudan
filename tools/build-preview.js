@@ -143,4 +143,6 @@ ${routinesHtml}
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, "index.html"), app);
 fs.writeFileSync(path.join(outDir, "review.html"), review);
+// Netlify 用：検索エンジンに載せない
+fs.writeFileSync(path.join(outDir, "_headers"), "/*\n  X-Robots-Tag: noindex, nofollow\n");
 console.log("出力しました: " + outDir);
