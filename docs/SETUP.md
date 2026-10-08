@@ -4,6 +4,7 @@
 
 ```
 ① デモ公開（Netlify Drop）……… 5分。まず見た目と動きを確認
+   └ 先生方への確認用プレビュー
 ② 本番公開 ………………………… 院のサイト or GitHub Pages
 ③ LIFF アプリ作成 ………………… LINE Developers
 ④ index.html に LIFF ID を設定
@@ -29,6 +30,27 @@
 > - 更新するときは「Deploys」タブに新しいフォルダを再度ドロップします。
 
 デモ URL は、③の LIFF のエンドポイントとしてそのまま使うこともできます（LINE 内での動作テスト用）。
+
+---
+
+## 先生方への確認用プレビューを作る
+
+本番公開の前に、先生方に内容を確認してもらうためのフォルダを作れます。
+
+```bash
+node tools/build-preview.js            # → out/preview に出力
+node tools/build-preview.js C:/Users/ptkim/Desktop/karada-soudan-preview   # 出力先を指定
+```
+
+出力されるもの：
+
+| ファイル | 内容 |
+|---|---|
+| `index.html` | アプリ本体。上部に「確認用プレビュー」の帯が付き、検索エンジンにも載りません |
+| `review.html` | 確認のお願い、チェック観点、相談文の例、全アドバイスと体操の一覧（項目番号つき） |
+
+このフォルダを ① と同じ手順で Netlify Drop にドロップし、発行された URL を先生方に共有します。
+先生方は `SHOULDER-P1` のような項目番号で修正箇所を指摘できます。修正は `index.html` の `ADV` / `ROUTINES` を直し、もう一度ビルドしてドロップしてください。
 
 ---
 
